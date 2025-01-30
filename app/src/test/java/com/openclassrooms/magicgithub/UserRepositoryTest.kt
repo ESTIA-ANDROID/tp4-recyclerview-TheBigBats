@@ -1,10 +1,11 @@
 package com.openclassrooms.magicgithub
 
+import com.openclassrooms.magicgithub.api.FakeApiService
 import com.openclassrooms.magicgithub.api.FakeApiServiceGenerator.FAKE_USERS
 import com.openclassrooms.magicgithub.api.FakeApiServiceGenerator.FAKE_USERS_RANDOM
+import com.openclassrooms.magicgithub.controller.UserController
 import com.openclassrooms.magicgithub.di.Injection
 import com.openclassrooms.magicgithub.model.User
-import com.openclassrooms.magicgithub.repository.UserRepository
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -16,20 +17,20 @@ import org.junit.runners.JUnit4
 
 /**
  * Unit test, which will execute on a JVM.
- * Testing UserRepository.
+ * Testing userController.
  */
 @RunWith(JUnit4::class)
-class UserRepositoryTest {
-    private lateinit var userRepository: UserRepository
+class userControllerTest {
+    private lateinit var userController: UserController
 
     @Before
     fun setup() {
-        userRepository = Injection.getRepository()
+        userController =  UserController(FakeApiService())
     }
 
     @Test
     fun getUsersWithSuccess() {
-        val usersActual = userRepository.getUsers()
+        val usersActual = userController.getUsers()
         val usersExpected: List<User> = FAKE_USERS
         assertEquals(
             usersActual,
@@ -39,10 +40,10 @@ class UserRepositoryTest {
 
     @Test
     fun generateRandomUserWithSuccess() {
-        val initialSize = userRepository.getUsers().size
-        userRepository.addRandomUser()
-        val user = userRepository.getUsers().last()
-        assertEquals(userRepository.getUsers().size, initialSize + 1)
+        val initialSize = userController.getUsers().size
+        userController.addRandomUser()
+        val user = userController.getUsers().last()
+        assertEquals(userController.getUsers().size, initialSize + 1)
         assertTrue(
             FAKE_USERS_RANDOM.filter {
                 it.equals(user)
@@ -52,15 +53,15 @@ class UserRepositoryTest {
 
     @Test
     fun deleteUserWithSuccess() {
-        val userToDelete = userRepository.getUsers()[0]
-        userRepository.deleteUser(userToDelete)
-        Assert.assertFalse(userRepository.getUsers().contains(userToDelete))
+        val userToDelete = userController.getUsers()[0]
+        userController.deleteUser(userToDelete)
+        Assert.assertFalse(userController.getUsers().contains(userToDelete))
     }
 
     // 🔥 **Test pour activer/désactiver un utilisateur via un swipe**
     @Test
     fun toggleUserActiveStateWithSuccess() {
-        val user = userRepository.getUsers()[0]
+        val user = userController.getUsers()[0]
         val initialState = user.isActive
 
         // Simulation du swipe pour désactiver
@@ -75,7 +76,7 @@ class UserRepositoryTest {
     // 🔥 **Test pour vérifier que le fond change en fonction de l'état de l'utilisateur**
     @Test
     fun checkBackgroundColorWhenTogglingUserState() {
-        val user = userRepository.getUsers()[0]
+        val user = userController.getUsers()[0]
 
         // Désactiver l'utilisateur (Swipe)
         user.isActive = false
@@ -89,7 +90,7 @@ class UserRepositoryTest {
     // 🔥 **Test pour réordonner les utilisateurs**
     @Test
     fun reorderUsersWithSuccess() {
-        val users = userRepository.getUsers().toMutableList()
+        val users = userController.getUsers().toMutableList()
 
         // Échanger le premier et le deuxième utilisateur
         val movedUser = users.removeAt(0)

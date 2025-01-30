@@ -1,8 +1,9 @@
 package com.openclassrooms.magicgithub.api
 
 import com.openclassrooms.magicgithub.model.User
+import com.openclassrooms.magicgithub.repository.UserRepository
 
-class FakeApiService : ApiService {
+class FakeApiService : UserRepository {
     private val _users = FakeApiServiceGenerator.FAKE_USERS
 
     /**

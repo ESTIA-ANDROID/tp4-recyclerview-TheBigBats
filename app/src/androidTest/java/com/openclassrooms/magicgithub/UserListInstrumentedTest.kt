@@ -9,7 +9,8 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import com.openclassrooms.magicgithub.di.Injection.getRepository
+import com.openclassrooms.magicgithub.api.FakeApiService
+import com.openclassrooms.magicgithub.controller.UserController
 import com.openclassrooms.magicgithub.ui.user_list.ListUserActivity
 import com.openclassrooms.magicgithub.utils.RecyclerViewUtils.ItemCount
 import com.openclassrooms.magicgithub.utils.RecyclerViewUtils.clickChildView
@@ -34,12 +35,13 @@ class UserListInstrumentedTest {
     @Rule
     @JvmField
     val mActivityRule = ActivityTestRule(ListUserActivity::class.java)
-
+    private lateinit var userController: UserController
     private var currentUsersSize = -1
 
     @Before
     fun setup() {
-        currentUsersSize = getRepository().getUsers().size
+        userController = UserController(FakeApiService())
+        currentUsersSize = userController.getUsers().size
     }
 
     @Test

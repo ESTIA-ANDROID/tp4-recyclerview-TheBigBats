@@ -6,20 +6,22 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.openclassrooms.magicgithub.api.FakeApiService
 import androidx.recyclerview.widget.RecyclerView
+import com.openclassrooms.magicgithub.controller.UserController
 import com.openclassrooms.magicgithub.databinding.ActivityListUserBinding
-import com.openclassrooms.magicgithub.di.Injection.getRepository
 import com.openclassrooms.magicgithub.model.User
 
 class ListUserActivity : AppCompatActivity(), UserListAdapter.Listener {
     private lateinit var binding: ActivityListUserBinding
     private lateinit var adapter: UserListAdapter
+    private lateinit var userController: UserController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        userController = UserController(FakeApiService())
         configureRecyclerView()
         configureFab()
         setupSwipeActions()
@@ -33,7 +35,7 @@ class ListUserActivity : AppCompatActivity(), UserListAdapter.Listener {
 
     // 📌 **Configuration RecyclerView avec ViewBinding**
     private fun configureRecyclerView() {
-        adapter = UserListAdapter(getRepository().getUsers().toMutableList(), this)
+        adapter = UserListAdapter(userController.getUsers().toMutableList(), this)
         binding.activityListUserRv.layoutManager = LinearLayoutManager(this)
         binding.activityListUserRv.adapter = adapter
     }
@@ -41,14 +43,14 @@ class ListUserActivity : AppCompatActivity(), UserListAdapter.Listener {
     // 📌 **Ajout d'un utilisateur aléatoire**
     private fun configureFab() {
         binding.activityListUserFab.setOnClickListener {
-            getRepository().addRandomUser()
+            userController.addRandomUser()
             loadData()
         }
     }
 
     // 📌 **Chargement des données**
     private fun loadData() {
-        adapter.updateList(getRepository().getUsers())
+        adapter.updateList(userController.getUsers())
     }
 
     // 📌 **Swipe pour activer/désactiver un utilisateur**
@@ -84,7 +86,7 @@ class ListUserActivity : AppCompatActivity(), UserListAdapter.Listener {
     // 📌 **Suppression d'un utilisateur**
     override fun onClickDelete(user: User) {
         Log.d(ListUserActivity::class.java.name, "User tries to delete an item.")
-        getRepository().deleteUser(user)
+        userController.deleteUser(user)
         loadData()
     }
 }
